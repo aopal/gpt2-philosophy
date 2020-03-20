@@ -1,0 +1,120 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script>
+        function generateText() {
+            document.getElementById("gpt-response").innerText = ""
+            document.getElementById("gpt-response").classList.add("hidden")
+            document.getElementById("loader").classList.remove("hidden")
+            body = document.getElementById("prefix").value
+
+            url = window.location.origin + "/gpt"
+
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    document.getElementById("loader").classList.add("hidden")
+                    document.getElementById("gpt-response").classList.remove("hidden")
+                    document.getElementById("gpt-response").innerText = xmlHttp.responseText
+                }
+            }
+
+            xmlHttp.open("POST", url, true); // true for asynchronous 
+            xmlHttp.setRequestHeader("Content-type", "text/plain");
+            xmlHttp.send(body);
+        }
+
+        function copyText() {
+            var range = document.createRange();
+            range.selectNode(document.getElementById("gpt-response"));
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand("copy");
+            window.getSelection().removeAllRanges();
+        }
+
+        function clearText() {
+            document.getElementById("gpt-response").innerText = ""
+            document.getElementById("prefix").value = ""
+        }
+    </script>
+    <style>
+        .header {
+            color: black;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            min-height: 25%;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader-container {
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            position: absolute;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            /* Light grey */
+            border-top: 16px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content container col-6 my-3">
+        <div class="py-2">
+            <h1 class="header">GPT-2 Philosophy</h1>
+            <p>Get a neural network to write philosophical musings for you.</p>
+            <p>Type a starting prompt into the box below or else leave it blank, then hit "Generate" to see what GPT-2
+                comes up with. Hit "Copy" to copy the output to your clipboard, and "Clear" to clear both the prompt and generated text.</p>
+        </div>
+        <h3 class="py-2">Prompt:</h3>
+        <div class="py-2">
+            <textarea class="col-12 card" id="prefix"></textarea>
+        </div>
+        <div class="row py-2 justify-content-around">
+            <button class="col col-3 p-2 btn btn-success" id="submit" onclick="generateText()">Generate</button>
+            <button class="col col-3 p-2 btn btn-primary" id="submit" onclick="copyText()">Copy</button>
+            <button class="col col-3 p-2 btn btn-danger" id="submit" onclick="clearText()">Clear</button>
+        </div>
+        <h3 class="py-2">Response:</h3>
+        <div class="py-2 card" id="gpt-response-container">
+            <div id="loader" class="row m-0 loader-container row justify-content-around py-2 hidden">
+                <div class="loader"></div>
+            </div>
+            <div class="p-3" id="gpt-response">Hit "Generate" to generate text here.</div>
+        </div>
+    </div>
+</body>
+
+</html>

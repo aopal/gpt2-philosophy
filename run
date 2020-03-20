@@ -1,0 +1,14 @@
+#!/bin/sh
+
+PORT=$1
+
+if [[ -z "$PORT" ]]; then
+  PORT=4000
+fi
+
+export PORT
+
+set -x
+
+docker build -t phil .
+docker run -e PORT -p $PORT:$PORT phil
