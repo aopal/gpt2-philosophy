@@ -5,12 +5,25 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 def textGenHandler(request):
     try:
-        # print(request.headers)
         content_length = int(request.headers.get('Content-Length', '0'))
         body = request.rfile.read(content_length)
         prefix = body.decode('utf-8')
 
-        response_text = gpt2.generate(sess, prefix=prefix, model_name=model_name, length=50, return_as_list=True)[0]
+        sample_length = int(request.headers.get('sample-length', '100'))
+        temperature = float(request.headers.get('temperature', '0.7'))
+        top_k = int(request.headers.get('top-k', '40'))
+
+        print("received generation request with prefix \" ", prefix, " \"")
+
+        response_text = gpt2.generate(
+            sess, 
+            prefix=prefix, 
+            model_name=model_name, 
+            length=sample_length,
+            temperature=temperature,
+            top_k=top_k,
+            return_as_list=True
+        )[0]
         response_text += "\n"
         response_bytes = response_text.encode('utf-8')
 
@@ -41,8 +54,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         handler = routes.get(self.path, notFoundHandler)
         handler(self)
 
+print("args: ", sys.argv)
+
 PORT = int(sys.argv[1])
-model_name = "124M"
+model_name = sys.argv[2]
 
 f = open("src/index.html", "rb")
 index_html = f.read() 
@@ -59,12 +74,3 @@ gpt2.load_gpt2(sess, model_name=model_name)
 
 httpd = HTTPServer(("", PORT), RequestHandler)
 httpd.serve_forever()
-
-###########
-
-sess = gpt2.start_tf_sess()
-gpt2.load_gpt2(sess, model_name=model_name)
-
-print("\n----------MODEL OUTPUT----------\n")
-single_text = gpt2.generate(sess, model_name=model_name, length=50, return_as_list=True)[0]
-print(single_text)

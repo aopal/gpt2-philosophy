@@ -1,2 +1,6 @@
 Dockerfile
 *.md
+docs/
+models-temp/ 
+samples/
+models/

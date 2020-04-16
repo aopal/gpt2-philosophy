@@ -1,14 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 
 PORT=$1
+MODEL=$2
 
 if [[ -z "$PORT" ]]; then
   PORT=4000
 fi
 
+if [[ -z "$MODEL" ]]; then
+  MODEL=124M
+fi
+
 export PORT
+export MODEL
 
 set -x
 
 docker build -t phil .
-docker run -e PORT -p $PORT:$PORT phil
+docker run -e PORT -e MODEL -p $PORT:$PORT phil

@@ -3,12 +3,20 @@
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script>
         function generateText() {
             document.getElementById("gpt-response").innerText = ""
             document.getElementById("gpt-response").classList.add("hidden")
             document.getElementById("loader").classList.remove("hidden")
             body = document.getElementById("prefix").value
+
+            len = document.getElementById("length").value
+            temp = document.getElementById("temp").value
+            top_k = document.getElementById("top_k").value
+            console.log(len + " " + temp + " " + top_k)
 
             url = window.location.origin + "/gpt"
 
@@ -23,6 +31,9 @@
 
             xmlHttp.open("POST", url, true); // true for asynchronous 
             xmlHttp.setRequestHeader("Content-type", "text/plain");
+            xmlHttp.setRequestHeader("sample-length", len);
+            xmlHttp.setRequestHeader("temperature", temp);
+            xmlHttp.setRequestHeader("top-k", top_k);
             xmlHttp.send(body);
         }
 
@@ -54,6 +65,20 @@
 
         textarea {
             resize: none;
+        }
+
+        span {
+            font-weight: bold;
+            /* padding: 5%; */
+            /* border: 1px solid black; */
+        }
+
+        button {
+            border: 1px solid black;
+        }
+
+        .collapse {
+            /* width: 80%; */
         }
 
         .hidden {
@@ -102,11 +127,30 @@
         <div class="py-2">
             <textarea class="col-12 card" id="prefix"></textarea>
         </div>
-        <div class="row py-2 justify-content-around">
-            <button class="col col-3 p-2 btn btn-success" id="submit" onclick="generateText()">Generate</button>
-            <button class="col col-3 p-2 btn btn-primary" id="submit" onclick="copyText()">Copy</button>
-            <button class="col col-3 p-2 btn btn-danger" id="submit" onclick="clearText()">Clear</button>
+
+        <div class="row py-2 px-2 justify-content-around">
+            <button class="col mx-2 btn btn-success" id="submit" onclick="generateText()">Generate</button>
+            <button class="col mx-2 btn btn-primary" id="submit" onclick="copyText()">Copy</button>
+            <button class="col mx-2 btn btn-danger" id="submit" onclick="clearText()">Clear</button>
         </div>
+
+
+        <div>
+            <a class=" " data-toggle="collapse" href="#advanced-options" role="button" aria-expanded="false" aria-controls="advanced-options">
+                Toggle Advanced Options
+            </a>
+        </div>
+        <div class="collapse row px-2" id="advanced-options">
+            <span class="col col-4 px-2">Length: <input type="number" name="" id="length" value="100"></span>
+            <span class="col col-4 px-2">Temperature: <input type="number" name="" id="temp" value="0.7"></span>
+            <span class="col col-4 px-2">Top K: <input type="number" name="" id="top_k" value="40"></span>
+
+            <p class="px-2">Length: number of tokens (roughly equivalent to words) to generate. Limit is 1000.</p>
+            <p class="px-2">Temperature: Amount of randomness/creativity to use in deciding new tokens. Set to 0.0 for pure determinism, set to 1.0 for maximum variety.</p>
+            <p class="px-2">Top K: GPT-2 will keep the <em>k</em> most recent tokens in memory when deciding the next token. Set to 0 for unlimited tokens in memory.</p>
+        </div>
+
+
         <h3 class="py-2">Response:</h3>
         <div class="py-2 card" id="gpt-response-container">
             <div id="loader" class="row m-0 loader-container row justify-content-around py-2 hidden">
